@@ -1,4 +1,4 @@
-name: BotData - Build and Deploy to GKE
+name: Build and Deploy to GKE
 
 on: workflow_dispatch
 
@@ -6,18 +6,14 @@ env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
   GKE_CLUSTER: devcluster
   GKE_ZONE: europe-west1-b
-  DEPLOYMENT_NAME: bot-data-deployment
+  DEPLOYMENT_NAME: jeff-bot-deployment
   NAMESPACE: discord
-  IMAGE: discord-bot/bot-data
+  IMAGE: discord-bot/jeff-bot
 
 jobs:
   setup-build-publish-deploy:
     name: Setup, Build, Publish, and Deploy
     runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: ./BotDataStore
 
     steps:
     - name: Checkout
@@ -64,11 +60,11 @@ jobs:
     # Deploy the Docker image to the GKE cluster
     - name: Deploy
       run: |-
-        ./kustomize edit add secret bot-data-db-url --from-literal=db-url=${{ secrets.DB_URL }}
-        ./kustomize edit add secret bot-data-db-name --from-literal=db-name=${{ secrets.DB_NAME }}
-        ./kustomize edit add secret bot-data-db-user --from-literal=db-user=${{ secrets.DB_USER }}
-        ./kustomize edit add secret bot-data-db-pass --from-literal=db-pass=${{ secrets.DB_PASS }}
-        ./kustomize edit set image discord-bot/bot-data=eu.gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA
+        ./kustomize edit add secret jeff-bot-discord --from-literal=discord-token=${{ secrets.DISCORD_TOKEN }}
+        ./kustomize edit add secret jeff-bot-project --from-literal=project-id=${{ secrets.GKE_PROJECT }}
+        ./kustomize edit add secret jeff-bot-gimg-token --from-literal=gimg-api-token=${{ secrets.GIMG_TOKEN }}
+        ./kustomize edit add secret jeff-bot-gimg-cx --from-literal=gimg-api-cx=${{ secrets.GIMG_CX }}
+        ./kustomize edit set image discord-bot/jeff-bot=eu.gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA
         ./kustomize build . | kubectl apply -f -
         kubectl rollout status -n $NAMESPACE deployment/$DEPLOYMENT_NAME
         kubectl get services -o wide
