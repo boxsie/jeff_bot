@@ -11,9 +11,9 @@ from utils.discord_helpers import send_text_list_to_author
 
 
 class Entrances(commands.Cog):
-    def __init__(self, bot, state_manager, sound_files):
+    def __init__(self, bot, user_manager, sound_files):
         self.bot = bot
-        self.state_manager = state_manager
+        self.user_manager = user_manager
         self.sound_files = sound_files
 
 
@@ -26,9 +26,7 @@ class Entrances(commands.Cog):
             await ctx.send(f'Could not find audio file \'{filename}\'')
             return
 
-        bot_user = self.state_manager.get_user(user.id)
-        bot_user.add_entrance(filename)
-        self.state_manager.save_state()
+        self.user_manager.add_entrance(user.id, filename)
 
         msg = f'User {user} entrance audio has been set to \'{filename}\''
         print(msg)
@@ -40,7 +38,7 @@ class Entrances(commands.Cog):
         print(f'List entrance sounds request from {ctx.message.author}')
 
         entrances = []
-        for u in self.state_manager.state.users:
+        for u in self.user_manager.users:
             entrances.append(f'{u.user_name}: {u.entrance_filename}')
 
         await send_text_list_to_author(ctx, entrances)
@@ -52,7 +50,7 @@ class Entrances(commands.Cog):
             return
 
         if after.channel and before.channel != after.channel:
-            user = self.state_manager.get_user(member.id)
+            user = self.user_manager.get_user(member.id)
 
             if user and user.entrance_filename:
                 print(f'{member.name} has arrived in {after.channel.name} playing entrance audio \'{user.entrance_filename}\'')

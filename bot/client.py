@@ -5,17 +5,17 @@ from discord import Intents
 
 from bot.voice import Voice
 from bot.ws_server import WSServer
-from utils.state import StateManager, BotUser
+from utils.users import BotUser
 
 
 class BotClient(Bot):
-    def __init__(self, state_manager, command_prefix='!'):
+    def __init__(self, user_manager, command_prefix='!'):
         intents = Intents.default()
         intents.members = True
         super().__init__(command_prefix=command_prefix, intents=intents)
 
         self.voice = Voice(self)
-        self.state_manager = state_manager
+        self.user_manager = user_manager
         self.ws_server = WSServer(self)
 
 
@@ -30,19 +30,17 @@ class BotClient(Bot):
                 if self.user.id == m.id:
                     continue
 
-                user = self.state_manager.get_user(m.id)
+                user = self.user_manager.get_user(m.id)
 
                 if user:
-                    user.nick_name = m.nick
                     user.user_name = m.name
                 else:
                     new_users.append(BotUser(
                         user_id=m.id,
-                        user_name=m.name,
-                        nick_name=m.nick
+                        user_name=m.name
                     ))
 
-            self.state_manager.add_users(new_users)
+            self.user_manager.add_users(new_users)
 
         print('Starting websocket server...')
         self.ws_server.start(event_loop=self.loop)
@@ -58,4 +56,4 @@ class BotClient(Bot):
 
 
     async def on_member_join(self, member):
-        self.state_manager.add_user(member.id, member.name, member.nick)
+        self.user_manager.add_user(member.id, member.name, member.nick)
