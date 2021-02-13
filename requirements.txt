@@ -1,0 +1,9 @@
+discord.py[voice]
+youtube-dl
+google-api-python-client
+google-cloud-storage
+google-cloud-pubsub
+Google-Images-Search
+Pillow
+websockets
+nest-asyncio

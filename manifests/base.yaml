@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: jeff-bot
+  name: jeff-bot-deployment
+  namespace: discord
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jeff-bot
+  template:
+    metadata:
+      labels:
+        app: jeff-bot
+    spec:
+      volumes:
+      - name: google-cloud-key
+        secret:
+          secretName: jeff-bot-pubsub-key
+      containers:
+      - env:
+        - name: DISCORD_TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: discord-token
+              name: jeff-bot-discord
+        - name: PROJECT_ID
+          valueFrom:
+            secretKeyRef:
+              key: project-id
+              name: jeff-bot-project
+        - name: GIMG_TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: gimg-api-token
+              name: jeff-bot-gimg-token
+        - name: GIMG_CX
+          valueFrom:
+            secretKeyRef:
+              key: gimg-api-cx
+              name: jeff-bot-gimg-cx
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /var/secrets/google/key.json
+        volumeMounts:
+        - name: google-cloud-key
+          mountPath: /var/secrets/google
+        image: discord-bot/jeff-bot:latest
+        name: jeff-bot
+        args: [
+          "-discord_token" ,"$(DISCORD_TOKEN)",
+          "-sounds_path", "sounds",
+          "-sounds_bucketpath", "boxsie-jeff-bot-data/sounds",
+          "-state_path", "state",
+          "-state_bucketpath", "boxsie-jeff-bot-data/state",
+          "-project_id", "$(PROJECT_ID)",
+          "-bucket_sub_name", "jeff-bot-sub-github",
+          "-gimg_api_token", "$(GIMG_TOKEN)",
+          "-gimg_api_cx", "$(GIMG_CX)",
+          "-wtp_path", "wtp",
+          "-wtp_bucketpath", "boxsie-jeff-bot-data/wtp"
+        ]
+        ports:
+        - containerPort: 8765
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: jeff-bot
+  name: jeff-bot-service
+  namespace: discord
+spec:
+  ports:
+  - port: 8765
+    targetPort: 8765
+  selector:
+    app: jeff-bot
