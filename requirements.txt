@@ -7,3 +7,4 @@ Google-Images-Search
 Pillow
 websockets
 nest-asyncio
+tqdm
