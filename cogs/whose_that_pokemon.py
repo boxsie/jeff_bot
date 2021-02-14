@@ -12,6 +12,7 @@ from PIL import Image
 from discord.ext import commands
 from utils.files import FileRepo
 from os.path import dirname
+from utils.discord_helpers import get_channel_from_ctx
 
 IMGS_DIR = 'poke_imgs'
 SOUNDS_DIR = 'poke_sounds'
@@ -62,29 +63,30 @@ class WtpPokemonFactory:
 
 
     def random(self):
+        poke_data = random.choice(self.poke_names)
+        poke_number = str(poke_data['number'])
+        poke_names = poke_data['names']
+        poke_path = self.poke_imgs.find(poke_number)
+        sil_path = self._create_wtp_sil(poke_number, poke_path.get_path())
+
         pokemon = WtpPokemon(
-            poke_data=random.choice(self.poke_names)
+            poke_number=poke_number,
+            poke_names=poke_names,
+            poke_img=Image.open(poke_path.get_path()),
+            sil_img=Image.open(sil_path.get_path()),
+            poke_sound_path=self.poke_sounds.find(poke_number).get_path()
         )
-
-        poke_path = self.poke_imgs.find(pokemon.number)
-        poke_img = Image.open(poke_path.get_path())
-        sil_path = self._create_wtp_sil(pokemon.number, poke_path.get_path())
-        sil_img = Image.open(sil_path.get_path())
-
-        pokemon.set_imgs(poke_img, sil_img)
 
         return pokemon
 
 
 class WtpPokemon:
-    def __init__(self, poke_data):
-        self.number = str(poke_data['number'])
-        self.names = poke_data['names']
-
-
-    def set_imgs(self, poke_img, sil_img):
+    def __init__(self, poke_number, poke_names, poke_img, sil_img, poke_sound_path):
+        self.number = poke_number
+        self.names = poke_names
         self.poke_img = poke_img
         self.sil_img = sil_img
+        self.poke_sound_path = poke_sound_path
 
 
     def get_poke_img_bytes(self):
@@ -191,8 +193,11 @@ class WhoseThatPokemon(commands.Cog):
                     channel=ctx.channel,
                     on_complete=self._finish_wtp_game
                 )
+
                 print(game.pokemon.names)
                 self.current_games.append(game)
+                channel = get_channel_from_ctx(bot=self.bot, ctx=ctx)
+                await self.bot.voice.play(channel=channel, source=game.pokemon.poke_sound_path, title='Whose that pokemon?')
                 await ctx.channel.send(file=discord.File(game.pokemon.get_sil_img_bytes(), 'whose-that-pokemon.png'))
                 await ctx.channel.send(f'*you have {GAME_TIME} seconds to answer - type !wtp "POKEMON NAME" to play*')
         else:
