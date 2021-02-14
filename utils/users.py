@@ -63,7 +63,6 @@ class UserManager():
 
         if response.status_code != 404 and response.status_code != 400:
             response_json = response.json()
-            print(response_json)
 
             return BotUser(
                  user_id=response_json['discordId'],

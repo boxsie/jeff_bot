@@ -1,5 +1,6 @@
 import os
 
+from tqdm import tqdm
 from google.cloud import storage
 from datetime import timezone, datetime
 
@@ -38,6 +39,8 @@ def download_files(bucket, bucket_path, output_path, overwrite=False):
 
     current_files = [] if overwrite else os.listdir(output_path)
 
+    print(f'Downloading all files from {bucket_path} to {output_path}')
+    files_to_download = []
     for blob in blobs:
         if blob.name[-1] != '/':
             _, tail = os.path.split(blob.name)
@@ -46,8 +49,16 @@ def download_files(bucket, bucket_path, output_path, overwrite=False):
                 continue
 
             full_path = os.path.join(output_path, tail)
-            print(f'Downloading {blob.name} to {full_path}')
+            files_to_download.append((blob, full_path))
+
+    if len(files_to_download):
+        for f in tqdm(files_to_download):
+            blob, full_path = f
             blob.download_to_filename(full_path)
+
+        print(f'{bucket_path} download complete')
+    else:
+        print(f'{bucket_path} had no files to download!')
 
 
 def upload_file(bucket, source_path, bucket_path, filename):
