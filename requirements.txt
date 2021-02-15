@@ -9,3 +9,5 @@ websockets
 nest-asyncio
 tqdm
 httpx
+numpy
+pandas
