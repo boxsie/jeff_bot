@@ -8,3 +8,4 @@ Pillow
 websockets
 nest-asyncio
 tqdm
+httpx
