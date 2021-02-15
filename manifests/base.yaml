@@ -58,7 +58,8 @@ spec:
           "-gimg_api_token", "$(GIMG_TOKEN)",
           "-gimg_api_cx", "$(GIMG_CX)",
           "-wtp_path", "wtp",
-          "-wtp_bucketpath", "boxsie-jeff-bot-data/wtp"
+          "-wtp_bucketpath", "boxsie-jeff-bot-data/wtp",
+          "-geo_sniff_path", "geo_sniff"
         ]
         ports:
         - containerPort: 8765
