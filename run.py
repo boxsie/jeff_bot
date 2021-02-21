@@ -25,7 +25,7 @@ if __name__ == "__main__":
     parser.add_argument('-user_api_url', type=str, help='The URL for the user store API', required=True)
     parser.add_argument('-wtp_path', type=str, help='The whose that pokemon media path', required=True)
     parser.add_argument('-gimg_api_token', type=str, help='The Google image search API token', required=True)
-    parser.add_argument('-geo_sniff_path', type=str, help='The Geo Sniff data path', required=True)
+    parser.add_argument('-geo_sniff_api_url', type=str, help='The Geo Sniff api url', required=True)
     parser.add_argument('-gimg_api_cx', type=str, help='The Google image search API CX', required=True)
     parser.add_argument('-sounds_bucketpath', type=str, help='The sounds bucket path', default=None)
     parser.add_argument('-wtp_bucketpath', type=str, help='The whose that pokemon bucket path', default=None)
@@ -42,7 +42,7 @@ if __name__ == "__main__":
     bot.add_cog(Entrances(bot, user_manager, sound_files))
     bot.add_cog(GoogleImages(bot, args.gimg_api_token, args.gimg_api_cx))
     bot.add_cog(WhoseThatPokemon(bot, args.wtp_path, args.wtp_bucketpath))
-    bot.add_cog(GeoSniff(bot, args.geo_sniff_path, args.gimg_api_token))
+    bot.add_cog(GeoSniff(bot, args.geo_sniff_api_url, args.gimg_api_token))
 
     bot.add_command(friday)
 

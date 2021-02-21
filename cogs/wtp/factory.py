@@ -31,6 +31,7 @@ class WtpPokemonFactory:
     def __init__(self, wtp_path, wtp_bucket_path):
         print('WTP factory is loading Pokemon assets...')
         self.wtp_path = wtp_path
+
         self.poke_imgs = FileRepo(base_path=os.path.join(wtp_path, IMGS_DIR), bucket_path=f'{wtp_bucket_path}/{IMGS_DIR}')
         self.poke_sounds = FileRepo(base_path=os.path.join(wtp_path, SOUNDS_DIR), bucket_path=f'{wtp_bucket_path}/{SOUNDS_DIR}')
         self.poke_sils = FileRepo(base_path=os.path.join(wtp_path, SILS_PATH))
