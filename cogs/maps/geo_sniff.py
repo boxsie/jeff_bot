@@ -1,7 +1,6 @@
 import os
 import discord
 import asyncio
-import pandas as pd
 
 from zipfile import ZipFile
 from os.path import dirname
