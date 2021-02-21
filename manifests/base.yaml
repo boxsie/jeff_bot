@@ -59,7 +59,7 @@ spec:
           "-gimg_api_cx", "$(GIMG_CX)",
           "-wtp_path", "wtp",
           "-wtp_bucketpath", "boxsie-jeff-bot-data/wtp",
-          "-geo_sniff_path", "geo_sniff"
+          "-geo_sniff_api_url", "http://bot-data-service:5000/api/geo"
         ]
         ports:
         - containerPort: 8765

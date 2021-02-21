@@ -10,4 +10,3 @@ nest-asyncio
 tqdm
 httpx
 numpy
-pandas
