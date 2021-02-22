@@ -10,6 +10,9 @@ from cogs.maps.location import Location
 IMG_BORDER = 10
 IMG_WIDTH = 640
 IMG_HEIGHT = 640
+RADIUS_ATTEMPTS = 50
+RADIUS_GROW_CNT = 5
+RADIUS_MULTI = 3
 REV_GEO_API_URL = 'https://maps.googleapis.com/maps/api/geocode/json?latlng={},{}&key={}'
 
 
@@ -40,6 +43,8 @@ class StreetView:
         attempts = 0
         r_earth = 6378
 
+        print(f'Attempting to get street view meta near {starting_loc.to_string()}')
+
         while True:
             a = np.random.rand() * 2 * math.pi
             r = radius * math.sqrt(np.random.rand())
@@ -55,16 +60,17 @@ class StreetView:
 
             attempts += 1
 
-            if attempts % 200 == 0:
-                radius = radius * 2
+            if attempts % RADIUS_ATTEMPTS == 0:
+                print('Unable to find suitible location, expanding radius...')
+                radius = radius * RADIUS_MULTI
 
-            if attempts > 1000:
+            if attempts > RADIUS_GROW_CNT * RADIUS_ATTEMPTS:
+                print('Unable to find suitible location, changing starting location')
                 return None
 
 
     async def check_for_street_view_img(self, location):
         url = location.street_view_meta_url(self.api_token)
-        print(f'Attempting to get street view meta from {location.to_string()}')
 
         try:
             async with httpx.AsyncClient() as client:

@@ -10,8 +10,8 @@ class GuessGame(object):
         self.on_complete = on_complete
         self.channel = channel
         self.started_on = datetime.now().utcnow()
-        self.game_timer = loop.create_task(self.time_out())
         self.finished = False
+        self.loop = loop
         self.game_time = game_time
 
 
@@ -22,6 +22,10 @@ class GuessGame(object):
         await self.on_complete(self)
 
 
+    def start(self):
+        self.game_timer = self.loop.create_task(self.time_out())
+
+
     def finish(self):
         self.finished = True
 
@@ -30,8 +34,20 @@ class GuessGame(object):
 
 
     @abc.abstractmethod
+    def set_id(self, game_id):
+        """Set the game ID"""
+        return
+
+
+    @abc.abstractmethod
     def set_answer(self, answer_obj):
         """Set the object that contains the answer"""
+        return
+
+
+    @abc.abstractmethod
+    def get_answer(self):
+        """Return the answer"""
         return
 
 
