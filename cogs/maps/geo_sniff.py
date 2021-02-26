@@ -50,9 +50,9 @@ class GeoSniff(commands.Cog):
 
         async with httpx.AsyncClient() as client:
             resp = await client.post(self.geo_sniff_api_url, headers=HEADERS, data=json.dumps({
-                "gameName": GAME_NAME,
-                "discordId": ctx.message.author.id,
-                "correctAnswer": game.get_answer()
+                'gameName': GAME_NAME,
+                'discordId': ctx.message.author.id,
+                'correctAnswer': game.get_answer()
             }))
             game.set_id(resp.json())
 
@@ -86,9 +86,10 @@ class GeoSniff(commands.Cog):
 
         async with httpx.AsyncClient() as client:
             resp = await client.post(f'{self.geo_sniff_api_url}/guess', headers=HEADERS, data=json.dumps({
-                "gameId": game.game_id,
-                "discordId": ctx.message.author.id,
-                "attempt": guess.lower()
+                'gameId': game.game_id,
+                'discordId': ctx.message.author.id,
+                'attempt': guess.lower(),
+                'correct': result
             }))
 
 
