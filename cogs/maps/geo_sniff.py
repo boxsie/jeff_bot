@@ -19,9 +19,10 @@ GAME_NAME = 'geosniff'
 HEADERS = {'Content-type':'application/json', 'Accept':'application/json'}
 
 class GeoSniff(commands.Cog):
-    def __init__(self, bot, geo_sniff_api_url, google_api_token):
+    def __init__(self, bot, geo_sniff_api_url, geo_score_api_url, google_api_token):
         self.bot = bot
         self.geo_sniff_api_url = geo_sniff_api_url
+        self.geo_score_api_url = geo_score_api_url
         self.current_games = []
         self.street_view = StreetView(geo_sniff_api_url, google_api_token)
 
@@ -125,3 +126,10 @@ class GeoSniff(commands.Cog):
 
         if not current_game and not guess:
             await self._start_game(ctx)
+
+
+    @commands.command(name='sniffers', help='Get the Geo Sniff leaderboard')
+    async def leaderboard(self, ctx):
+        async with httpx.AsyncClient() as client:
+            resp = await client.get(f'{self.geo_score_api_url}/leaderboard', headers=HEADERS)
+            await ctx.channel.send(resp.json())

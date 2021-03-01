@@ -5,7 +5,9 @@ import random
 from os.path import dirname
 from PIL import Image
 from io import BytesIO
+from zipfile import ZipFile
 from utils.files import FileRepo
+from utils.gcs_helpers import connect_to_bucket, download_file
 
 
 IMGS_DIR = 'poke_imgs'
@@ -32,14 +34,49 @@ class WtpPokemonFactory:
         print('WTP factory is loading Pokemon assets...')
         self.wtp_path = wtp_path
 
-        self.poke_imgs = FileRepo(base_path=os.path.join(wtp_path, IMGS_DIR), bucket_path=f'{wtp_bucket_path}/{IMGS_DIR}')
-        self.poke_sounds = FileRepo(base_path=os.path.join(wtp_path, SOUNDS_DIR), bucket_path=f'{wtp_bucket_path}/{SOUNDS_DIR}')
+        imgs_dir = os.path.join(wtp_path, IMGS_DIR)
+        sounds_dir = os.path.join(wtp_path, SOUNDS_DIR)
+
+        path_split = wtp_bucket_path.split('/')
+        bucket_name = path_split[0]
+        bucket_dir = '/'.join(path_split[1:])
+        bucket = connect_to_bucket(bucket_name)
+
+        self._download_extract_resource(
+            bucket=bucket,
+            bucket_path=bucket_dir,
+            filename=f'{IMGS_DIR}.zip',
+            output_path=imgs_dir
+        )
+
+        self._download_extract_resource(
+            bucket=bucket,
+            bucket_path=bucket_dir,
+            filename=f'{SOUNDS_DIR}.zip',
+            output_path=sounds_dir
+        )
+
+        self.poke_imgs = FileRepo(base_path=imgs_dir)
+        self.poke_sounds = FileRepo(base_path=sounds_dir)
         self.poke_sils = FileRepo(base_path=os.path.join(wtp_path, SILS_PATH))
 
         with open(JSON_DATA_PATH) as f:
             self.poke_names = json.load(f)
 
         print('WTP factory loading complete')
+
+
+    def _download_extract_resource(self, bucket, bucket_path, filename, output_path):
+        download_file(
+            bucket=bucket,
+            bucket_path=bucket_path,
+            filename=filename,
+            output_path=self.wtp_path,
+            overwrite=True
+        )
+
+        with ZipFile(os.path.join(self.wtp_path, filename), 'r') as zip_ref:
+            zip_ref.extractall(output_path)
 
 
     def _create_wtp_sil(self, poke_number, poke_img_path):

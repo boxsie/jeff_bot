@@ -1,0 +1,11 @@
+{
+    "path": {
+        "sounds": "sounds",
+        "wtp": "wtp"
+    },
+    "api": {
+        "user": "user",
+        "geo_sniff": "geo",
+        "geo_score": "geoscore"
+    }
+}
