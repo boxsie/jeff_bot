@@ -50,16 +50,12 @@ spec:
         name: jeff-bot
         args: [
           "-discord_token" ,"$(DISCORD_TOKEN)",
-          "-sounds_path", "sounds",
-          "-sounds_bucketpath", "boxsie-jeff-bot-data/sounds",
-          "-user_api_url", "http://bot-data-service:5000/api/user",
+          "-gimg_api_cx", "$(GIMG_CX)",
+          "-gimg_api_token", "$(GIMG_TOKEN)",
           "-project_id", "$(PROJECT_ID)",
           "-bucket_sub_name", "jeff-bot-sub-github",
-          "-gimg_api_token", "$(GIMG_TOKEN)",
-          "-gimg_api_cx", "$(GIMG_CX)",
-          "-wtp_path", "wtp",
-          "-wtp_bucketpath", "boxsie-jeff-bot-data/wtp",
-          "-geo_sniff_api_url", "http://bot-data-service:5000/api/geo"
+          "-api_url", "http://bot-data-service:5000/api",
+          "-bucket_path", "boxsie-jeff-bot-data"
         ]
         ports:
         - containerPort: 8765
