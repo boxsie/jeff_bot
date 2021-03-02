@@ -37,24 +37,27 @@ class WtpPokemonFactory:
         imgs_dir = os.path.join(wtp_path, IMGS_DIR)
         sounds_dir = os.path.join(wtp_path, SOUNDS_DIR)
 
-        path_split = wtp_bucket_path.split('/')
-        bucket_name = path_split[0]
-        bucket_dir = '/'.join(path_split[1:])
-        bucket = connect_to_bucket(bucket_name)
+        if not os.path.exists(imgs_dir) or not os.path.exists(sounds_dir):
+            path_split = wtp_bucket_path.split('/')
+            bucket_name = path_split[0]
+            bucket_dir = '/'.join(path_split[1:])
+            bucket = connect_to_bucket(bucket_name)
 
-        self._download_extract_resource(
-            bucket=bucket,
-            bucket_path=bucket_dir,
-            filename=f'{IMGS_DIR}.zip',
-            output_path=imgs_dir
-        )
+            if not os.path.exists(imgs_dir):
+                self._download_extract_resource(
+                    bucket=bucket,
+                    bucket_path=bucket_dir,
+                    filename=f'{IMGS_DIR}.zip',
+                    output_path=imgs_dir
+                )
 
-        self._download_extract_resource(
-            bucket=bucket,
-            bucket_path=bucket_dir,
-            filename=f'{SOUNDS_DIR}.zip',
-            output_path=sounds_dir
-        )
+            if not os.path.exists(sounds_dir):
+                self._download_extract_resource(
+                    bucket=bucket,
+                    bucket_path=bucket_dir,
+                    filename=f'{SOUNDS_DIR}.zip',
+                    output_path=sounds_dir
+                )
 
         self.poke_imgs = FileRepo(base_path=imgs_dir)
         self.poke_sounds = FileRepo(base_path=sounds_dir)

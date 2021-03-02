@@ -12,6 +12,7 @@ from urllib.parse import urljoin
 from cogs.maps.geo_sniff_game import GeoSniffGame
 from cogs.maps.location import Location
 from cogs.maps.street_view import StreetView
+from texttable import Texttable
 
 GAME_TIME = 90
 GAME_NAME = 'geosniff'
@@ -132,4 +133,24 @@ class GeoSniff(commands.Cog):
     async def leaderboard(self, ctx):
         async with httpx.AsyncClient() as client:
             resp = await client.get(f'{self.geo_score_api_url}/leaderboard', headers=HEADERS)
-            await ctx.channel.send(resp.json())
+            leaderboard = resp.json()
+
+            table = Texttable()
+            table.set_deco(Texttable.HEADER)
+            table.set_cols_dtype(['t', 'i', 'i', 'i'])
+            table.set_cols_align(["l", "r", "r", "r"])
+
+            table_rows = [["Name", "Played", "Won", "Points"]]
+
+            for row in leaderboard:
+                table_rows.append([value for (key, value) in row.items() if key != 'discordId'])
+
+            table.add_rows(table_rows)
+
+            await ctx.channel.send(f'```{table.draw()}```')
+
+
+
+
+
+

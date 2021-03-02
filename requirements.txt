@@ -10,3 +10,4 @@ nest-asyncio
 tqdm
 httpx
 numpy
+texttable
