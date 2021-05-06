@@ -5,6 +5,7 @@ class GeoSniffGame(GuessGame):
     def __init__(self, guild_id, on_complete, channel, loop, game_time):
         super().__init__(guild_id, on_complete, channel, loop, game_time)
         self.location = None
+        self.clue_count = 0
 
 
     def set_id(self, game_id):
@@ -14,6 +15,8 @@ class GeoSniffGame(GuessGame):
     def set_answer(self, location):
         self.location = location
 
+    def add_clue(self):
+        self.clue_count += 1
 
     def make_attempt(self, user_id, guess):
         if not self.finished:

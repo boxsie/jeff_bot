@@ -10,9 +10,9 @@ from cogs.maps.location import Location
 IMG_BORDER = 10
 IMG_WIDTH = 640
 IMG_HEIGHT = 640
-RADIUS_ATTEMPTS = 50
+RADIUS_ATTEMPTS = 150
 RADIUS_GROW_CNT = 5
-RADIUS_MULTI = 3
+RADIUS_MULTI = 1.5
 REV_GEO_API_URL = 'https://maps.googleapis.com/maps/api/geocode/json?latlng={},{}&key={}'
 
 
@@ -149,3 +149,19 @@ class StreetView:
         full_img_bytes.seek(0)
 
         return full_img_bytes
+
+
+    def get_distance(self, loc1, loc2):
+        R = 6370
+        lat1 = math.radians(loc1.lat)
+        lon1 = math.radians(loc1.lng)
+        lat2 = math.radians(loc2.lat)
+        lon2 = math.radians(loc2.lng)
+
+        dlon = lon2 - lon1
+        dlat = lat2- lat1
+
+        a = math.sin(dlat / 2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2)**2
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+        distance = R * c
+        return distance

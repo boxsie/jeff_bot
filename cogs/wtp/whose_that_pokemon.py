@@ -27,7 +27,7 @@ class WhoseThatPokemon(commands.Cog):
             return
 
         if not current_game and guess:
-            await ctx.channel.send('There is no game to guess on!')
+            await ctx.channel.send('There\'s no game to guess on mate')
             return
 
         if current_game and guess:

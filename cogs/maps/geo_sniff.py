@@ -15,6 +15,10 @@ from cogs.maps.street_view import StreetView
 from texttable import Texttable
 
 GAME_TIME = 90
+CLUE_TIME = 30
+ALLOWED_CLUE_TIME = 10
+CLUE_RADIUS = 2
+MAX_CLUES = 3
 GAME_NAME = 'geosniff'
 
 HEADERS = {'Content-type':'application/json', 'Accept':'application/json'}
@@ -95,6 +99,30 @@ class GeoSniff(commands.Cog):
             }))
 
 
+    async def _get_clue(self, ctx, game):
+        game.add_clue()
+        game.add_time(CLUE_TIME)
+
+        await ctx.channel.send(f'''**{ctx.message.author.name}** stinks and needs a clue\n{CLUE_TIME} seconds have been added\nJeff is sniffing one out...''')
+
+        loc = await self.street_view.find_random_street_view_loc(
+            starting_loc=game.location,
+            radius=CLUE_RADIUS
+        )
+
+        if loc == None:
+            await ctx.send(f'Jeff couldn\'t sniff out clue :(')
+            return
+
+        img_grid_bytes = await self.street_view.create_img_grid(loc)
+        clue_delta = self.street_view.get_distance(game.location, loc)
+
+        await ctx.channel.send(
+            content=f'**Jeff has moved {clue_delta:.2f} km**',
+            file=discord.File(img_grid_bytes, 'where-is-jeff.png')
+        )
+
+
     async def _finish_game(self, game, winning_user=None):
         self.current_games.remove(game)
 
@@ -118,7 +146,7 @@ class GeoSniff(commands.Cog):
             return
 
         if not current_game and guess:
-            await ctx.channel.send('There is no game to guess on!')
+            await ctx.channel.send('There\'s no game to guess on mate')
             return
 
         if current_game and guess:
@@ -127,6 +155,28 @@ class GeoSniff(commands.Cog):
 
         if not current_game and not guess:
             await self._start_game(ctx)
+
+
+    @commands.command(name='stinks', help='Get a another image')
+    async def stinks(self, ctx):
+        current_game = self._get_game_in_progress(ctx.guild.id)
+
+        if current_game:
+            if current_game.clue_count >= MAX_CLUES:
+                await ctx.channel.send(f'No more enough clues I\'m afraid mate')
+                return
+
+            rem_secs = current_game.time_remaining()
+            if rem_secs > ALLOWED_CLUE_TIME:
+                await ctx.channel.send(f'It\'s too early for a clue mate, try again in {int(rem_secs) - ALLOWED_CLUE_TIME} seconds')
+                return
+
+            await self._get_clue(ctx, current_game)
+            return
+
+        if not current_game:
+            await ctx.channel.send('Can\'t get a clue when there\' no game to guess on mate')
+            return
 
 
     @commands.command(name='sniffers', help='Get the Geo Sniff leaderboard')
